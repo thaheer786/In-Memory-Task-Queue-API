@@ -9,10 +9,10 @@ This project demonstrates core backend concepts such as **queue management, task
 
 The objective of this project is to build a **thread-safe in-memory task queue** that:
 
-- Enforces FIFO task processing
-- Handles concurrent client requests safely
-- Tracks the lifecycle of each task
-- Returns appropriate HTTP status codes and error messages
+- Enforces FIFO task processing  
+- Handles concurrent client requests safely  
+- Tracks the lifecycle of each task  
+- Returns appropriate HTTP status codes and error messages  
 
 This serves as a foundational backend system before moving to distributed message brokers like Kafka or RabbitMQ.
 
@@ -20,11 +20,11 @@ This serves as a foundational backend system before moving to distributed messag
 
 ## 🛠 Tech Stack
 
-- **Language:** Python 3.12
-- **Framework:** FastAPI
-- **Server:** Uvicorn
-- **Concurrency Control:** threading.Lock
-- **Data Structures:** collections.deque, dictionary
+- **Language:** Python 3.12  
+- **Framework:** FastAPI  
+- **Server:** Uvicorn  
+- **Concurrency Control:** threading.Lock  
+- **Data Structures:** collections.deque, dictionary  
 
 ---
 
@@ -39,7 +39,10 @@ Each task contains the following fields:
   "status": "pending | processing | completed",
   "created_at": "ISO-8601 timestamp"
 }
-⚙️ Setup & Run Instructions
+---
+
+## ⚙️ Setup & Run Instructions
+
 1️⃣ Clone the Repository
 bash
 Copy code
@@ -62,6 +65,8 @@ uvicorn main:app --reload
 arduino
 Copy code
 http://127.0.0.1:8000/docs
+
+---
 📌 API Endpoints
 ➤ Enqueue a Task
 POST /tasks
@@ -78,6 +83,7 @@ Copy code
 {
   "id": "uuid"
 }
+---
 ➤ Dequeue a Task (FIFO)
 POST /tasks/dequeue
 
@@ -90,18 +96,19 @@ json
 Copy code
 {
   "id": "uuid",
-  "payload": {...},
+  "payload": {},
   "status": "processing",
   "created_at": "timestamp"
 }
 Response – 404 Not Found (Queue empty)
-
+---
 ➤ Get Task by ID
 GET /tasks/{task_id}
 
 bash
 Copy code
 curl http://127.0.0.1:8000/tasks/{task_id}
+---
 ➤ Complete a Task
 PUT /tasks/{task_id}/complete
 
@@ -115,6 +122,7 @@ Responses
 409 Conflict – Task not in processing state
 
 404 Not Found – Task not found
+---
 
 ➤ View Pending Queue
 GET /queue/view
@@ -123,6 +131,7 @@ bash
 Copy code
 curl http://127.0.0.1:8000/queue/view
 Returns all pending tasks in FIFO order.
+---
 
 ➤ Queue Statistics
 GET /queue/stats
@@ -139,15 +148,13 @@ Copy code
   "processing": 0,
   "completed": 1
 }
+---
 🔒 Concurrency & Thread Safety
-Shared in-memory data structures (deque and dict) are protected using a mutex lock (threading.Lock)
+Shared in-memory data structures (deque and dict) are protected using a mutex lock (threading.Lock).
+All critical operations (enqueue, dequeue, complete) are atomic.
+This prevents race conditions, task duplication, and inconsistent state, ensuring correct FIFO behavior under concurrent access.
 
-All critical operations (enqueue, dequeue, complete) are atomic
-
-Prevents race conditions, task duplication, and inconsistent state
-
-Ensures correct FIFO behavior under concurrent access
-
+---
 ⚡ Simulating Concurrent Access
 Option 1: Apache Bench
 bash
@@ -160,11 +167,15 @@ import requests
 from concurrent.futures import ThreadPoolExecutor
 
 def enqueue():
-    requests.post("http://127.0.0.1:8000/tasks", json={"payload":{"job":"test"}})
+    requests.post(
+        "http://127.0.0.1:8000/tasks",
+        json={"payload": {"job": "test"}}
+    )
 
 with ThreadPoolExecutor(max_workers=10) as executor:
     for _ in range(20):
         executor.submit(enqueue)
+        ---
 📚 Resources
 Designing a RESTful API with Python and Flask
 
@@ -173,6 +184,7 @@ Introduction to Threading in Python
 Node.js Event Loop and Asynchronous Operations
 
 Queue Data Structure – GeeksforGeeks
+---
 
 ✅ Evaluation Readiness
 ✔ All required endpoints implemented
@@ -181,6 +193,3 @@ Queue Data Structure – GeeksforGeeks
 ✔ Correct HTTP status codes
 ✔ Clean and readable code
 ✔ Complete documentation
-
-📄 License
-This project is intended for educational purposes.
